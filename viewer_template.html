@@ -133,7 +133,7 @@
 
         // Load OBJ Data (Injected by Python as Base64)
         const b64Data = `{{obj_data}}`;
-        const objFilename = `{{obj_filename}}`;
+        const objFilename = "{{obj_filename}}";
         const objText = atob(b64Data);
         
         const loader = new THREE.OBJLoader();

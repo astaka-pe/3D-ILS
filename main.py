@@ -139,31 +139,32 @@ def main() -> None:
     st.sidebar.markdown("**First Character**")
     alphabet = list(string.ascii_uppercase)
     
-    # Render A-Z in a 4-column grid (more stable on narrow mobile screens)
-    cols_first = st.sidebar.columns(4)
-    for i, letter in enumerate(alphabet):
-        col = cols_first[i % 4]
-        # Use primary style if currently selected
-        is_selected = st.session_state["char_first"] == letter
-        btn_type = "primary" if is_selected else "secondary"
-        
-        if col.button(letter, key=f"btn_f_{letter}", type=btn_type, use_container_width=True):
-            st.session_state["char_first"] = letter
-            st.rerun()
+    # Render A-Z row-by-row in a 4-column layout to preserve order on mobile
+    num_cols = 4
+    for row_start in range(0, len(alphabet), num_cols):
+        row_cols = st.sidebar.columns(num_cols)
+        for col_idx, letter in enumerate(alphabet[row_start:row_start + num_cols]):
+            col = row_cols[col_idx]
+            is_selected = st.session_state["char_first"] == letter
+            btn_type = "primary" if is_selected else "secondary"
+            if col.button(letter, key=f"btn_f_{letter}", type=btn_type, use_container_width=True):
+                st.session_state["char_first"] = letter
+                st.rerun()
 
     st.sidebar.markdown("---")
 
     # 2. Second Character Selection Grid (Y-extrusion)
     st.sidebar.markdown("**Second Character**")
-    cols_last = st.sidebar.columns(4)
-    for i, letter in enumerate(alphabet):
-        col = cols_last[i % 4]
-        is_selected = st.session_state["char_last"] == letter
-        btn_type = "primary" if is_selected else "secondary"
-        
-        if col.button(letter, key=f"btn_l_{letter}", type=btn_type, use_container_width=True):
-            st.session_state["char_last"] = letter
-            st.rerun()
+    num_cols = 4
+    for row_start in range(0, len(alphabet), num_cols):
+        row_cols = st.sidebar.columns(num_cols)
+        for col_idx, letter in enumerate(alphabet[row_start:row_start + num_cols]):
+            col = row_cols[col_idx]
+            is_selected = st.session_state["char_last"] == letter
+            btn_type = "primary" if is_selected else "secondary"
+            if col.button(letter, key=f"btn_l_{letter}", type=btn_type, use_container_width=True):
+                st.session_state["char_last"] = letter
+                st.rerun()
 
     st.sidebar.markdown("---")
 

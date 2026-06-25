@@ -1,8 +1,11 @@
-<h2 align="center">
-  <a href="https://3d-ils-dmj6kubfyxjpvuk9wrfoow.streamlit.app/" style="font-size: 1.4em; font-weight: bold; text-decoration: none;">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Corben:700">
+
+<h1 align="center">
+  <a href="https://3d-ils-dmj6kubfyxjpvuk9wrfoow.streamlit.app/" style="font-size: 1.6em; font-weight: bold; text-decoration: none; font-family: 'Corben', cursive; letter-spacing: 0.05em; font-style: italic;">
     3D Initial Logo Studio
   </a>
-</h2>
+</h1>
+
 
 An interactive Streamlit application that generates a 3D ambigram-like logo from two user-selected initials.
 
