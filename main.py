@@ -98,7 +98,7 @@ def write_obj(path: str, vertices: np.ndarray, faces: np.ndarray) -> None:
             f.write(f"f {face[0] + 1} {face[1] + 1} {face[2] + 1}\n")
 
 
-def render_3d_viewer(obj_path: str) -> None:
+def render_3d_viewer(obj_path: str, obj_filename: str) -> None:
     """Reads the generated OBJ file, injects it into the HTML template, and renders it."""
     if not os.path.exists(TEMPLATE_FILE):
         st.error(f"Required template file '{TEMPLATE_FILE}' not found.")
@@ -115,6 +115,7 @@ def render_3d_viewer(obj_path: str) -> None:
 
     b64_obj_data = base64.b64encode(obj_data.encode("utf-8")).decode("utf-8")
     final_html = html_template.replace("{{obj_data}}", b64_obj_data)
+    final_html = final_html.replace("{{obj_filename}}", obj_filename)
 
     st.iframe(final_html, height=550)
 
@@ -135,13 +136,13 @@ def main() -> None:
     st.sidebar.header("Configuration")
 
     # 1. First Character Selection Grid (Z-extrusion)
-    st.sidebar.markdown("**First Character (Z-extrusion)**")
+    st.sidebar.markdown("**First Character**")
     alphabet = list(string.ascii_uppercase)
     
-    # Render A-Z in a compact 7-column grid
-    cols_first = st.sidebar.columns(7)
+    # Render A-Z in a 4-column grid (more stable on narrow mobile screens)
+    cols_first = st.sidebar.columns(4)
     for i, letter in enumerate(alphabet):
-        col = cols_first[i % 7]
+        col = cols_first[i % 4]
         # Use primary style if currently selected
         is_selected = st.session_state["char_first"] == letter
         btn_type = "primary" if is_selected else "secondary"
@@ -153,10 +154,10 @@ def main() -> None:
     st.sidebar.markdown("---")
 
     # 2. Second Character Selection Grid (Y-extrusion)
-    st.sidebar.markdown("**Second Character (Y-extrusion)**")
-    cols_last = st.sidebar.columns(7)
+    st.sidebar.markdown("**Second Character**")
+    cols_last = st.sidebar.columns(4)
     for i, letter in enumerate(alphabet):
-        col = cols_last[i % 7]
+        col = cols_last[i % 4]
         is_selected = st.session_state["char_last"] == letter
         btn_type = "primary" if is_selected else "secondary"
         
@@ -218,7 +219,9 @@ def main() -> None:
     # Main Panel Viewer Render
     if os.path.exists(output_filename):
         st.subheader(f"Current Model: {st.session_state['char_first']} + {st.session_state['char_last']}")
-        render_3d_viewer(output_filename)
+        
+        obj_filename = f"{st.session_state['char_first']}{st.session_state['char_last']}.obj"
+        render_3d_viewer(output_filename, obj_filename)
     else:
         st.info("Select letters from the sidebar grid and click 'Generate 3D Mesh' to begin.")
 

@@ -1,8 +1,14 @@
-# 3D Initial Logo Studio
+<h2 align="center">
+  <a href="https://3d-ils-dmj6kubfyxjpvuk9wrfoow.streamlit.app/" style="font-size: 1.4em; font-weight: bold; text-decoration: none;">
+    3D Initial Logo Studio
+  </a>
+</h2>
 
 An interactive Streamlit application that generates a 3D ambigram-like logo from two user-selected initials.
 
 The generated object is constructed as the intersection of two orthogonally extruded letter volumes. When viewed from different directions, the resulting shape reveals different characters.
+
+
 
 ![demo](docs/demo.png)
 

@@ -4,8 +4,19 @@
     <meta charset="utf-8">
     <title>3D OBJ Viewer</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #f0f2f6; }
-        #canvas-container { width: 100vw; height: 500px; }
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f2f6;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
@@ -13,6 +24,32 @@
 </head>
 <body>
     <div id="canvas-container"></div>
+    <div id="button-container" style="position: fixed; top: 10px; right: 10px; z-index: 100; display: flex; gap: 8px;">
+        <button id="download-btn" style="
+            padding: 10px 15px;
+            background-color: #1f77b4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        ">📥 Download OBJ</button>
+        <button id="screenshot-btn" style="
+            padding: 10px 15px;
+            background-color: #1f77b4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        ">📸 Screenshot</button>
+    </div>
+    <style>
+        #button-container { position: fixed; top: 10px; right: 10px; z-index: 100; display: flex; gap: 8px; }
+        #download-btn:hover, #screenshot-btn:hover { background-color: #155a96; }
+    </style>
 
     <script>
         const container = document.getElementById('canvas-container');
@@ -28,8 +65,18 @@
 
         // Renderer Setup
         const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio || 1);
         renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(renderer.domElement);
+        
+        // Ensure correct initial size after iframe load
+        function updateRendererSize() {
+            const rect = container.getBoundingClientRect();
+            renderer.setSize(rect.width, rect.height);
+            camera.aspect = rect.width / rect.height;
+            camera.updateProjectionMatrix();
+        }
+        updateRendererSize();
 
         // Controls
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -86,6 +133,7 @@
 
         // Load OBJ Data (Injected by Python as Base64)
         const b64Data = `{{obj_data}}`;
+        const objFilename = `{{obj_filename}}`;
         const objText = atob(b64Data);
         
         const loader = new THREE.OBJLoader();
@@ -122,10 +170,41 @@
         // Handle window resize
         window.addEventListener('resize', onWindowResize, false);
         function onWindowResize() {
-            camera.aspect = container.clientWidth / container.clientHeight;
+            const rect = container.getBoundingClientRect();
+            camera.aspect = rect.width / rect.height;
             camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setSize(rect.width, rect.height);
         }
+
+        // Download OBJ functionality
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const objData = atob(b64Data);
+            const blob = new Blob([objData], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = objFilename || 'logo.obj';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        });
+
+        // Screenshot functionality
+        document.getElementById('screenshot-btn').addEventListener('click', function() {
+            // Render one more frame to ensure the current state is captured
+            renderer.render(scene, camera);
+            
+            // Get canvas data as PNG
+            const imageData = renderer.domElement.toDataURL('image/png');
+            
+            // Create a temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = imageData;
+            link.download = 'logo_3d.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
     </script>
 </body>
 </html>
